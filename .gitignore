@@ -1,0 +1,30 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment and secrets
+.env
+.venv/
+env/
+venv/
+ENV/
+
+# Download and temporary files
+downloads/
+temp/
+*.tmp
+*.mp4
+*.mkv
+*.webm
+*.part
+*.ytdl
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
