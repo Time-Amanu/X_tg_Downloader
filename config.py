@@ -15,6 +15,7 @@ class Config:
     MAX_FILE_SIZE_MB: int = int(os.getenv("MAX_FILE_SIZE_MB", "50"))
     AUTO_DOWNLOAD_IN_GROUPS: bool = os.getenv("AUTO_DOWNLOAD_IN_GROUPS", "true").lower() in ("true", "1", "yes")
     CLEANUP_STATUS_MESSAGES: bool = os.getenv("CLEANUP_STATUS_MESSAGES", "true").lower() in ("true", "1", "yes")
+    PORT: int | None = int(os.getenv("PORT")) if os.getenv("PORT") and os.getenv("PORT").strip().isdigit() else None
 
     # Allowed chats/users filter (comma separated). Empty means all users/chats allowed.
     _raw_allowed = os.getenv("ALLOWED_CHATS", "").strip()

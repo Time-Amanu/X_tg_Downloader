@@ -6,6 +6,7 @@ import sys
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
+from aiohttp import web
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
@@ -21,6 +22,23 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)],
 )
 logger = logging.getLogger("telegram_downloader")
+
+
+async def start_healthcheck_server(port: int) -> web.AppRunner:
+    """Starts a minimal HTTP healthcheck server for cloud hosting platforms (Render, Koyeb, etc.)."""
+    async def health_check(_: web.Request) -> web.Response:
+        return web.Response(text="Bot is running OK", status=200)
+
+    app = web.Application()
+    app.router.add_get("/", health_check)
+    app.router.add_get("/health", health_check)
+
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+    logger.info(f"Health check HTTP server started on port {port}.")
+    return runner
 
 
 async def setup_bot_commands(bot: Bot) -> None:
@@ -69,9 +87,19 @@ async def main() -> None:
     logger.info(f"Bot @{bot_info.username} (ID: {bot_info.id}) started successfully!")
     logger.info("Listening for TikTok and Twitter/X links in private chats and groups...")
 
+    # Optional HTTP server for cloud hosts that require a bound port (Render, Koyeb, HuggingFace, etc.)
+    health_runner = None
+    if config.PORT:
+        try:
+            health_runner = await start_healthcheck_server(config.PORT)
+        except Exception as e:
+            logger.warning(f"Could not start health check HTTP server on port {config.PORT}: {e}")
+
     try:
         await dp.start_polling(bot)
     finally:
+        if health_runner:
+            await health_runner.cleanup()
         await bot.session.close()
         logger.info("Bot session closed.")
 
