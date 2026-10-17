@@ -10,17 +10,16 @@ router = Router(name="commands_router")
 logger = logging.getLogger(__name__)
 
 
-def is_chat_allowed(chat_id: int, user_id: int) -> bool:
-    """Checks if chat or user is allowed if ALLOWED_CHATS whitelist is active."""
-    if not config.ALLOWED_CHATS:
-        return True
-    return chat_id in config.ALLOWED_CHATS or user_id in config.ALLOWED_CHATS
+def is_chat_allowed(chat_id: int, user_id: int, username: str | None = None) -> bool:
+    """Checks if chat, user ID, or username is allowed."""
+    return config.is_allowed(chat_id, user_id, username)
 
 
 @router.message(CommandStart())
 async def handle_start(message: Message) -> None:
     """Handles the /start command."""
-    if not is_chat_allowed(message.chat.id, message.from_user.id if message.from_user else 0):
+    user = message.from_user
+    if not is_chat_allowed(message.chat.id, user.id if user else 0, user.username if user else None):
         return
 
     text = (
@@ -41,7 +40,8 @@ async def handle_start(message: Message) -> None:
 @router.message(Command("help"))
 async def handle_help(message: Message) -> None:
     """Handles the /help command."""
-    if not is_chat_allowed(message.chat.id, message.from_user.id if message.from_user else 0):
+    user = message.from_user
+    if not is_chat_allowed(message.chat.id, user.id if user else 0, user.username if user else None):
         return
 
     text = (
@@ -66,6 +66,7 @@ async def handle_help(message: Message) -> None:
 @router.message(Command("ping"))
 async def handle_ping(message: Message) -> None:
     """Health check ping command."""
-    if not is_chat_allowed(message.chat.id, message.from_user.id if message.from_user else 0):
+    user = message.from_user
+    if not is_chat_allowed(message.chat.id, user.id if user else 0, user.username if user else None):
         return
     await message.reply("🏓 <b>Pong!</b> Bot is running and ready.", parse_mode=ParseMode.HTML)

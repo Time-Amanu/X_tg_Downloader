@@ -17,13 +17,30 @@ class Config:
     CLEANUP_STATUS_MESSAGES: bool = os.getenv("CLEANUP_STATUS_MESSAGES", "true").lower() in ("true", "1", "yes")
     PORT: int | None = int(os.getenv("PORT")) if os.getenv("PORT") and os.getenv("PORT").strip().isdigit() else None
 
-    # Allowed chats/users filter (comma separated). Empty means all users/chats allowed.
-    _raw_allowed = os.getenv("ALLOWED_CHATS", "").strip()
-    ALLOWED_CHATS: set[int] = {
-        int(chat_id.strip())
-        for chat_id in _raw_allowed.split(",")
-        if chat_id.strip().lstrip("-").isdigit()
+    # Allowed usernames or numeric chat/user IDs (case-insensitive)
+    # Locked to @Timelight217 by default; can be overridden via ALLOWED_USERS or ALLOWED_CHATS
+    _raw_allowed = (os.getenv("ALLOWED_USERS") or os.getenv("ALLOWED_CHATS") or "Timelight217").strip()
+    ALLOWED_USERS: set[str] = {
+        item.strip().lstrip("@").lower()
+        for item in _raw_allowed.split(",")
+        if item.strip()
     }
+
+    # Backward compatibility for numeric ALLOWED_CHATS
+    ALLOWED_CHATS: set[int] = {
+        int(item) for item in ALLOWED_USERS if item.lstrip("-").isdigit()
+    }
+
+    @classmethod
+    def is_allowed(cls, chat_id: int, user_id: int, username: str | None = None) -> bool:
+        """Returns True if the message is from an authorized user or chat."""
+        if not cls.ALLOWED_USERS:
+            return True
+        if str(user_id) in cls.ALLOWED_USERS or str(chat_id) in cls.ALLOWED_USERS:
+            return True
+        if username and username.strip().lstrip("@").lower() in cls.ALLOWED_USERS:
+            return True
+        return False
 
     @classmethod
     def validate(cls) -> None:

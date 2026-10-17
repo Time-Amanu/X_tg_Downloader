@@ -21,11 +21,9 @@ router = Router(name="media_router")
 logger = logging.getLogger(__name__)
 
 
-def is_chat_allowed(chat_id: int, user_id: int) -> bool:
-    """Checks if chat or user is allowed if ALLOWED_CHATS whitelist is active."""
-    if not config.ALLOWED_CHATS:
-        return True
-    return chat_id in config.ALLOWED_CHATS or user_id in config.ALLOWED_CHATS
+def is_chat_allowed(chat_id: int, user_id: int, username: str | None = None) -> bool:
+    """Checks if chat, user ID, or username is allowed."""
+    return config.is_allowed(chat_id, user_id, username)
 
 
 async def process_and_send_video(
@@ -126,8 +124,8 @@ async def handle_dl_command(message: Message, bot: Bot) -> None:
     Can be used in both direct messages and groups.
     Also supports replying to a message containing a link with '/dl'.
     """
-    user_id = message.from_user.id if message.from_user else 0
-    if not is_chat_allowed(message.chat.id, user_id):
+    user = message.from_user
+    if not is_chat_allowed(message.chat.id, user.id if user else 0, user.username if user else None):
         return
 
     text_to_check = message.text or ""
@@ -159,8 +157,8 @@ async def handle_text_urls(message: Message, bot: Bot) -> None:
     Detects TikTok and Twitter/X URLs in standard text messages.
     Works in direct messages and in groups (if AUTO_DOWNLOAD_IN_GROUPS is enabled).
     """
-    user_id = message.from_user.id if message.from_user else 0
-    if not is_chat_allowed(message.chat.id, user_id):
+    user = message.from_user
+    if not is_chat_allowed(message.chat.id, user.id if user else 0, user.username if user else None):
         return
 
     # Ignore bot commands in this handler (handled by command routers)
