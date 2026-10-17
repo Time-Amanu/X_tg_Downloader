@@ -85,7 +85,7 @@ class DownloaderService:
             "retries": 3,
             "extractor_args": {
                 "youtube": {
-                    "player_client": ["android", "ios", "mweb"]
+                    "player_client": ["android"]
                 }
             },
             "http_headers": {

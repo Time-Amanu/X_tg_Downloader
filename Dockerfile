@@ -6,10 +6,11 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Install system dependencies (ffmpeg is essential for stream merging and format conversion)
+# Install system dependencies (ffmpeg for stream merging, nodejs for yt-dlp JS challenges)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     curl \
+    nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
