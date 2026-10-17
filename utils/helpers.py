@@ -35,35 +35,39 @@ def format_video_caption(
 ) -> str:
     """
     Builds a clean, styled HTML caption for Telegram video messages.
-    Telegram caption limit is 1024 characters.
+    Ensures HTML tags are never severed by truncation. Telegram limit is 1024 characters.
     """
     platform_label = "TikTok" if platform.lower() == "tiktok" else "Twitter / X"
     icon = "🎵" if platform.lower() == "tiktok" else "🐦"
 
+    # Clean and strip bloated query params from link for clean embedding
+    clean_link = source_url.strip() if source_url else ""
+    if clean_link and ("tiktok.com" in clean_link.lower() or "twitter.com" in clean_link.lower() or "x.com" in clean_link.lower()):
+        clean_link = clean_link.split("?")[0]
+
+    link_line = f"{icon} <a href=\"{html.escape(clean_link)}\">{platform_label}</a>" if clean_link else f"{icon} {platform_label}"
+    
+    # Safe uploader string
+    safe_uploader = html.escape(uploader.strip()[:60]) if uploader else None
+    uploader_line = f"👤 <i>{safe_uploader}</i>" if safe_uploader else ""
+
+    # Calculate safe space for title to ensure total caption never exceeds max_length
+    fixed_length = len(link_line) + (len(uploader_line) + 2 if uploader_line else 0) + 15
+    title_budget = max(50, max_length - fixed_length)
+
     lines = []
-
-    # Title / description
     if title:
-        clean_title = html.escape(title.strip())
-        if len(clean_title) > 250:
-            clean_title = clean_title[:247] + "..."
-        lines.append(f"<b>{clean_title}</b>\n")
+        raw_title = title.strip()
+        if len(raw_title) > title_budget:
+            raw_title = raw_title[: title_budget - 3] + "..."
+        lines.append(f"<b>{html.escape(raw_title)}</b>\n")
 
-    # Author
-    if uploader:
-        lines.append(f"👤 <i>{html.escape(uploader)}</i>")
+    if uploader_line:
+        lines.append(uploader_line)
 
-    # Source platform and link
-    if source_url:
-        lines.append(f"{icon} <a href=\"{html.escape(source_url)}\">{platform_label}</a>")
-    else:
-        lines.append(f"{icon} {platform_label}")
+    lines.append(link_line)
 
-    caption = "\n".join(lines)
-    if len(caption) > max_length:
-        caption = caption[: max_length - 3] + "..."
-
-    return caption
+    return "\n".join(lines)
 
 
 async def safe_delete_message(bot: Bot, chat_id: int, message_id: int) -> None:

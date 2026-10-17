@@ -20,6 +20,12 @@ def test_url_extraction():
         ("Short link: https://vt.tiktok.com/ZS2xyzABC/!", [
             ("tiktok", "https://vt.tiktok.com/ZS2xyzABC/")
         ]),
+        ("Long TikTok with tracking query: https://www.tiktok.com/@mrbeast/video/7200000000000000000?is_from_webapp=1&sender_device=pc&_t=8a123", [
+            ("tiktok", "https://www.tiktok.com/@mrbeast/video/7200000000000000000")
+        ]),
+        ("TikTok Photo mode: https://www.tiktok.com/@creator/photo/7300000000000000000", [
+            ("tiktok", "https://www.tiktok.com/@creator/photo/7300000000000000000")
+        ]),
         ("VM link: https://vm.tiktok.com/ZM8rxyzABC/?k=1", [
             ("tiktok", "https://vm.tiktok.com/ZM8rxyzABC/?k=1")
         ]),
@@ -29,7 +35,7 @@ def test_url_extraction():
             ("twitter", "https://twitter.com/elonmusk/status/1780000000000000000")
         ]),
         ("X link with tracking query: https://x.com/OpenAI/status/1780000000000000000?s=20&t=xyz123", [
-            ("twitter", "https://x.com/OpenAI/status/1780000000000000000?s=20&t=xyz123")
+            ("twitter", "https://x.com/OpenAI/status/1780000000000000000")
         ]),
 
         # Multiple links in single message
