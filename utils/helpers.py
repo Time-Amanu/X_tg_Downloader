@@ -37,12 +37,19 @@ def format_video_caption(
     Builds a clean, styled HTML caption for Telegram video messages.
     Ensures HTML tags are never severed by truncation. Telegram limit is 1024 characters.
     """
-    platform_label = "TikTok" if platform.lower() == "tiktok" else "Twitter / X"
-    icon = "🎵" if platform.lower() == "tiktok" else "🐦"
+    if platform.lower() == "tiktok":
+        platform_label = "TikTok"
+        icon = "🎵"
+    elif platform.lower() in ("youtube", "youtube_shorts"):
+        platform_label = "YouTube Shorts"
+        icon = "🔴"
+    else:
+        platform_label = "Twitter / X"
+        icon = "🐦"
 
     # Clean and strip bloated query params from link for clean embedding
     clean_link = source_url.strip() if source_url else ""
-    if clean_link and ("tiktok.com" in clean_link.lower() or "twitter.com" in clean_link.lower() or "x.com" in clean_link.lower()):
+    if clean_link and any(d in clean_link.lower() for d in ("tiktok.com", "twitter.com", "x.com", "youtube.com")):
         clean_link = clean_link.split("?")[0]
 
     link_line = f"{icon} <a href=\"{html.escape(clean_link)}\">{platform_label}</a>" if clean_link else f"{icon} {platform_label}"

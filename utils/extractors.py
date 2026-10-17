@@ -12,6 +12,11 @@ TWITTER_X_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
+YOUTUBE_SHORTS_PATTERN = re.compile(
+    r"(https?://(?:www\.|m\.)?youtube\.com/shorts/[a-zA-Z0-9_-]+(?:\?[^\s<>\"']*)?)",
+    re.IGNORECASE,
+)
+
 
 def _clean_url(url: str) -> str:
     """Strips sentence punctuation and bloat tracking query parameters from URL."""
@@ -22,6 +27,11 @@ def _clean_url(url: str) -> str:
     # Remove tracking query bloat from standard Twitter / X status URLs
     elif ("twitter.com" in cleaned.lower() or "x.com" in cleaned.lower()) and "/status/" in cleaned.lower():
         cleaned = re.sub(r"((?:twitter|x)\.com/[^/?#]+/status/\d+)(?:\?[^\s#]*)?", r"\1", cleaned)
+    # Remove tracking query bloat from YouTube Shorts URLs
+    elif "youtube.com" in cleaned.lower() and "/shorts/" in cleaned.lower():
+        cleaned = re.sub(r"(youtube\.com/shorts/[a-zA-Z0-9_-]+)(?:\?[^\s#]*)?", r"\1", cleaned)
+        if not cleaned.startswith("http"):
+            cleaned = "https://" + cleaned
     return cleaned
 
 
@@ -50,6 +60,13 @@ def extract_media_urls(text: str) -> List[Tuple[str, str]]:
         if url not in seen:
             seen.add(url)
             found.append(("twitter", url))
+
+    # Search for YouTube Shorts URLs
+    for match in YOUTUBE_SHORTS_PATTERN.finditer(text):
+        url = _clean_url(match.group(1))
+        if url not in seen:
+            seen.add(url)
+            found.append(("youtube", url))
 
     return found
 

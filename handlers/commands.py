@@ -24,14 +24,15 @@ async def handle_start(message: Message) -> None:
 
     text = (
         "👋 <b>Welcome to Media Downloader Bot!</b>\n\n"
-        "I can download and send high-quality videos from <b>TikTok</b> and <b>Twitter / X</b>.\n\n"
+        "I can download and send high-quality videos from <b>TikTok</b>, <b>Twitter / X</b>, and <b>YouTube Shorts</b>.\n\n"
         "🚀 <b>Features:</b>\n"
-        "• <b>Direct Chat</b>: Simply send me any TikTok or Twitter/X link.\n"
+        "• <b>Direct Chat</b>: Simply send me any TikTok, Twitter/X, or YouTube Shorts link.\n"
         "• <b>Groups & Channels</b>: Add me to any group and I will automatically fetch videos whenever someone posts a link!\n"
         "• Fast streaming playback support.\n\n"
         "📌 <b>Supported Links:</b>\n"
         "• TikTok (<code>tiktok.com</code>, <code>vt.tiktok.com</code>, <code>vm.tiktok.com</code>)\n"
-        "• Twitter / X (<code>x.com/.../status/...</code>, <code>twitter.com/.../status/...</code>)\n\n"
+        "• Twitter / X (<code>x.com/.../status/...</code>, <code>twitter.com/.../status/...</code>)\n"
+        "• YouTube Shorts (<code>youtube.com/shorts/...</code>)\n\n"
         "💡 <i>Try sending a link now, or use /help for more options!</i>"
     )
     await message.reply(text, parse_mode=ParseMode.HTML, disable_web_page_preview=True)

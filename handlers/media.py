@@ -40,7 +40,13 @@ async def process_and_send_video(
 
     try:
         # Send initial status message
-        platform_name = "TikTok" if platform == "tiktok" else "Twitter / X"
+        if platform == "tiktok":
+            platform_name = "TikTok"
+        elif platform in ("youtube", "youtube_shorts"):
+            platform_name = "YouTube Shorts"
+        else:
+            platform_name = "Twitter / X"
+
         status_msg = await message.reply(
             f"⏳ <b>Downloading {platform_name} video...</b>\n<i>Please wait a moment.</i>",
             parse_mode=ParseMode.HTML,

@@ -38,14 +38,23 @@ def test_url_extraction():
             ("twitter", "https://x.com/OpenAI/status/1780000000000000000")
         ]),
 
+        # YouTube Shorts tests
+        ("Watch this short https://www.youtube.com/shorts/dQw4w9WgXcQ so good", [
+            ("youtube", "https://www.youtube.com/shorts/dQw4w9WgXcQ")
+        ]),
+        ("Short with tracking params: https://youtube.com/shorts/abcdef12345?feature=share&si=test", [
+            ("youtube", "https://youtube.com/shorts/abcdef12345")
+        ]),
+
         # Multiple links in single message
-        ("Both: https://vt.tiktok.com/ZS2xyz/ and https://x.com/user/status/123456789", [
+        ("Both: https://vt.tiktok.com/ZS2xyz/ and https://x.com/user/status/123456789 and https://youtube.com/shorts/xyz123", [
             ("tiktok", "https://vt.tiktok.com/ZS2xyz/"),
-            ("twitter", "https://x.com/user/status/123456789")
+            ("twitter", "https://x.com/user/status/123456789"),
+            ("youtube", "https://youtube.com/shorts/xyz123")
         ]),
 
         # Non-matching text
-        ("Just a normal message with https://google.com and https://youtube.com", []),
+        ("Just a normal message with https://google.com and https://youtube.com/watch?v=123", []),
     ]
 
     for text, expected in test_cases:
@@ -69,6 +78,16 @@ def test_helpers():
     assert "Epic Cat Jump" in caption
     assert "CatLover" in caption
     assert "TikTok" in caption
+
+    yt_caption = format_video_caption(
+        platform="youtube",
+        title="Epic Tech Short",
+        uploader="TechChannel",
+        source_url="https://www.youtube.com/shorts/123",
+    )
+    assert "Epic Tech Short" in yt_caption
+    assert "YouTube Shorts" in yt_caption
+    assert "🔴" in yt_caption
 
     print("✅ All helper tests passed!")
 

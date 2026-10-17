@@ -76,6 +76,7 @@ class DownloaderService:
         ydl_opts = {
             "outtmpl": output_template,
             "format": "best[ext=mp4]/bestvideo[ext=mp4]+bestaudio[ext=m4a]/best",
+            "merge_output_format": "mp4",
             "noplaylist": True,
             "quiet": True,
             "no_warnings": True,
