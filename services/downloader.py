@@ -83,6 +83,11 @@ class DownloaderService:
             "max_filesize": max_bytes,
             "socket_timeout": 30,
             "retries": 3,
+            "extractor_args": {
+                "youtube": {
+                    "player_client": ["android", "ios", "mweb"]
+                }
+            },
             "http_headers": {
                 "User-Agent": (
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
