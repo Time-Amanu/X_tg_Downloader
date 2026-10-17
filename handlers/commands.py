@@ -21,7 +21,6 @@ def is_chat_allowed(chat_id: int, user_id: int) -> bool:
 async def handle_start(message: Message) -> None:
     """Handles the /start command."""
     if not is_chat_allowed(message.chat.id, message.from_user.id if message.from_user else 0):
-        await message.reply("⛔ Sorry, access to this bot is restricted.")
         return
 
     text = (
@@ -67,4 +66,6 @@ async def handle_help(message: Message) -> None:
 @router.message(Command("ping"))
 async def handle_ping(message: Message) -> None:
     """Health check ping command."""
+    if not is_chat_allowed(message.chat.id, message.from_user.id if message.from_user else 0):
+        return
     await message.reply("🏓 <b>Pong!</b> Bot is running and ready.", parse_mode=ParseMode.HTML)
